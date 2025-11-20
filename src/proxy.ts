@@ -75,7 +75,15 @@ const getDefaultDashboardRoute = (role: UserRole): string => {
 
 // This function can be marked `async` if using `await` inside
 export function proxy(request: NextRequest) {
-    console.log('pathName', request.nextUrl.pathname);
+    const pathName = request.nextUrl.pathname;
+
+    const accessToken = request.cookies.get('accessToken')?.value || null;
+
+    const userRole: UserRole | null = null;
+
+    if (accessToken) {
+    }
+
     return NextResponse.next();
 }
 
