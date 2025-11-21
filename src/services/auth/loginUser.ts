@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 import { parse } from 'cookie';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { getDefaultDashboardRoute, UserRole } from '../../lib/auth-utils';
 import { loginValidationZodSchema } from './zod';
 
 export const loginUser = async (
@@ -9,6 +12,8 @@ export const loginUser = async (
     formData: any
 ): Promise<any> => {
     try {
+        const redirectTo = formData.get('redirect') as string | null;
+        console.log(redirectTo, 'server Actions');
         let accessTokenObject: null | any = null;
         let refreshTokenObject: null | any = null;
         const loginData = {
@@ -88,8 +93,25 @@ export const loginUser = async (
             return { success: false, error: result.message || 'Login failed' };
         }
 
-        return result;
+        const verifiedToken: JwtPayload | string = jwt.verify(
+            accessTokenObject.accessToken,
+            process.env.JWT_ACCESS_SECRET as string
+        );
+        if (typeof verifiedToken === 'string') {
+            throw new Error('Invalid token');
+        }
+
+        const userRole: UserRole = (verifiedToken as JwtPayload).role;
+
+        redirect(
+            redirectTo
+                ? redirectTo.toString()
+                : getDefaultDashboardRoute(userRole)
+        );
     } catch (error) {
+        if ((error as any)?.digest?.startsWith?.('NEXT_REDIRECT')) {
+            throw error;
+        }
         console.log(error);
         return { error: 'Login failed' };
     }
