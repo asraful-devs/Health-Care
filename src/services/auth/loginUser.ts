@@ -2,9 +2,13 @@
 'use server';
 import { parse } from 'cookie';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getDefaultDashboardRoute, UserRole } from '../../lib/auth-utils';
+import {
+    getDefaultDashboardRoute,
+    isValidRedirectForRole,
+    UserRole,
+} from '../../lib/auth-utils';
+import { setCookie } from './tokenHandlers';
 import { loginValidationZodSchema } from './zod';
 
 export const loginUser = async (
@@ -42,6 +46,7 @@ export const loginUser = async (
                 'Content-Type': 'application/json',
             },
         });
+
         const result = await res.json();
 
         const setCookieHeaders = res.headers.getSetCookie();
@@ -69,9 +74,9 @@ export const loginUser = async (
             throw new Error('Tokens not found in cookies');
         }
 
-        const cookieStore = await cookies();
+        // const cookieStore = await cookies();
 
-        cookieStore.set('accessToken', accessTokenObject.accessToken, {
+        await setCookie('accessToken', accessTokenObject.accessToken, {
             secure: true,
             httpOnly: true,
             maxAge: parseInt(accessTokenObject['Max-Age']) || 1000 * 60 * 60,
@@ -79,7 +84,7 @@ export const loginUser = async (
             sameSite: accessTokenObject['SameSite'] || 'none',
         });
 
-        cookieStore.set('refreshToken', refreshTokenObject.refreshToken, {
+        await setCookie('refreshToken', refreshTokenObject.refreshToken, {
             secure: true,
             httpOnly: true,
             maxAge:
@@ -103,11 +108,27 @@ export const loginUser = async (
 
         const userRole: UserRole = (verifiedToken as JwtPayload).role;
 
-        redirect(
-            redirectTo
-                ? redirectTo.toString()
-                : getDefaultDashboardRoute(userRole)
-        );
+        //   redirect(
+        //       redirectTo
+        //           ? redirectTo.toString()
+        //           : getDefaultDashboardRoute(userRole)
+        // );
+
+        if (!result.success) {
+            throw new Error(result.message || 'Login failed');
+        }
+
+        if (redirectTo) {
+            const requestPath = redirectTo.toString();
+
+            if (isValidRedirectForRole(requestPath, userRole)) {
+                redirect(requestPath);
+            } else {
+                redirect(getDefaultDashboardRoute(userRole));
+            }
+        } else {
+            redirect(getDefaultDashboardRoute(userRole));
+        }
     } catch (error) {
         if ((error as any)?.digest?.startsWith?.('NEXT_REDIRECT')) {
             throw error;

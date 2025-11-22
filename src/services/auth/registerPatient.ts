@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
+import { loginUser } from './loginUser';
 import { registerValidationZodSchema } from './zod';
 
 export const registerPatient = async (
@@ -53,12 +54,18 @@ export const registerPatient = async (
                 method: 'POST',
                 body: newFormData,
             }
-        ).then((res) => res.json());
+        );
+        const result = await res.json();
 
-        console.log(res, 'res');
+        if (result.success) {
+            await loginUser(_currentState, formData);
+        }
 
-        return res;
+        return result;
     } catch (error) {
+        if ((error as any)?.digest?.startsWith?.('NEXT_REDIRECT')) {
+            throw error;
+        }
         console.log(error);
         return { error: 'Registration failed' };
     }
