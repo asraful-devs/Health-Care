@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { loginUser } from '@/services/auth/loginUser';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { Button } from '../../ui/button';
 import {
     Field,
@@ -24,7 +25,13 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
             return null;
         }
     };
-    console.log(state);
+
+    useEffect(() => {
+        if (state && !state.success && state.message) {
+            toast.error(state.message);
+        }
+    }, [state]);
+
     return (
         <form action={formAction}>
             {redirect && (

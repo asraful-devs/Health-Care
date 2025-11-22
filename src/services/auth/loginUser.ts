@@ -115,7 +115,9 @@ export const loginUser = async (
         // );
 
         if (!result.success) {
-            throw new Error(result.message || 'Login failed');
+            throw new Error(
+                result.message || 'Login failed, please try again.'
+            );
         }
 
         if (redirectTo) {
@@ -134,6 +136,13 @@ export const loginUser = async (
             throw error;
         }
         console.log(error);
-        return { error: 'Login failed' };
+        return {
+            success: false,
+            message: `${
+                process.env.NODE_ENV === 'development'
+                    ? (error as Error).message
+                    : 'Login failed. You might have entered incorrect credentials.'
+            }`,
+        };
     }
 };

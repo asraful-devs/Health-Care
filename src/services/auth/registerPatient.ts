@@ -67,6 +67,13 @@ export const registerPatient = async (
             throw error;
         }
         console.log(error);
-        return { error: 'Registration failed' };
+        return {
+            success: false,
+            message: `${
+                process.env.NODE_ENV === 'development'
+                    ? (error as Error).message
+                    : 'Registration failed. You might have entered incorrect credentials.'
+            }`,
+        };
     }
 };

@@ -1,130 +1,101 @@
-'use client';
-
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { getCookie } from '../../services/auth/tokenHandlers';
 import { Button } from '../ui/button';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '../ui/sheet';
+import LogoutButton from './LogoutButton';
 import { ModeToggle } from './ModeToggle';
 
-const PublicNavbar = () => {
-    const [isOpen, setIsOpen] = useState(false);
-
+const PublicNavbar = async () => {
     const navItems = [
-        { name: 'Home', link: '/' },
-        { name: 'About', link: '/about' },
-        { name: 'Services', link: '/services' },
-        { name: 'Contact', link: '/contact' },
+        { href: '#', label: 'Consultation' },
+        { href: '#', label: 'Health Plans' },
+        { href: '#', label: 'Medicine' },
+        { href: '#', label: 'Diagnostics' },
+        { href: '#', label: 'NGOs' },
     ];
 
+    const accessToken = await getCookie('accessToken');
+
     return (
-        <nav className='sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/80'>
-            <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-                <div className='flex h-16 items-center justify-between md:h-20'>
-                    {/* Logo */}
-                    <Link
-                        href='/'
-                        className='group flex items-center space-x-2 transition-all duration-300'
-                    >
-                        <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-blue-600 text-white shadow-lg transition-all duration-300 group-hover:shadow-xl group-hover:scale-105'>
-                            <span className='text-lg font-bold'>HC</span>
-                        </div>
-                        <span className='hidden font-bold text-gray-900 transition-colors duration-300 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400 sm:inline-block text-base md:text-lg'>
-                            Health Care
-                        </span>
-                    </Link>
+        <header className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur  dark:bg-background/95'>
+            <div className='container mx-auto flex h-16 items-center justify-between px-4'>
+                <Link href='/' className='flex items-center space-x-2'>
+                    <span className='text-xl font-bold text-primary'>
+                        Health Care
+                    </span>
+                </Link>
 
-                    {/* Desktop Navigation */}
-                    <div className='hidden items-center space-x-1 md:flex'>
-                        {navItems.map((item) => (
-                            <Link
-                                key={item.name}
-                                href={item.link}
-                                className='relative px-3 py-2 text-sm font-medium text-gray-700 transition-all duration-300 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 group'
-                            >
-                                <span className='relative'>
-                                    {item.name}
-                                    <span className='absolute bottom-0 left-0 h-0.5 w-0 bg-linear-to-r from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-full'></span>
-                                </span>
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* Right Section - Desktop */}
-                    <div className='hidden items-center space-x-3 md:flex'>
-                        <ModeToggle />
-                        <Link href='/login'>
-                            <Button
-                                variant='outline'
-                                className='transition-all duration-300 hover:scale-105 hover:shadow-lg dark:hover:bg-gray-800'
-                            >
-                                Login
-                            </Button>
-                        </Link>
-                        <Link href='/register'>
-                            <Button className='bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 dark:from-blue-600 dark:to-blue-700'>
-                                Sign Up
-                            </Button>
-                        </Link>
-                    </div>
-
-                    {/* Mobile Menu Button & Right Section - Mobile */}
-                    <div className='flex items-center space-x-2 md:hidden'>
-                        <ModeToggle />
-                        <button
-                            onClick={() => setIsOpen(!isOpen)}
-                            className='inline-flex items-center justify-center rounded-md p-2 text-gray-700 transition-all duration-300 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-                            aria-expanded='false'
+                <nav className='hidden md:flex items-center space-x-6 text-sm font-medium'>
+                    {navItems.map((link) => (
+                        <Link
+                            key={link.label}
+                            href={link.href}
+                            className='text-foreground hover:text-primary transition-colors'
                         >
-                            <span className='sr-only'>Open main menu</span>
-                            {isOpen ? (
-                                <X className='h-6 w-6 transition-transform duration-300' />
-                            ) : (
-                                <Menu className='h-6 w-6 transition-transform duration-300' />
-                            )}
-                        </button>
-                    </div>
+                            {link.label}
+                        </Link>
+                    ))}
+                </nav>
+
+                <div className='hidden md:flex items-center space-x-2'>
+                    <ModeToggle />
+                    {accessToken ? (
+                        <LogoutButton />
+                    ) : (
+                        <Link href='/login'>
+                            <Button>Login</Button>
+                        </Link>
+                    )}
                 </div>
 
-                {/* Mobile Navigation Menu */}
-                {isOpen && (
-                    <div className='animate-in fade-in slide-in-from-top-2 overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/95 md:hidden'>
-                        <div className='space-y-1 px-2 pb-4 pt-2'>
-                            {navItems.map((item) => (
-                                <Link
-                                    key={item.name}
-                                    href={item.link}
-                                    onClick={() => setIsOpen(false)}
-                                    className='block rounded-md px-3 py-2 text-base font-medium text-gray-700 transition-all duration-300 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-gray-800 dark:hover:text-blue-400'
-                                >
-                                    {item.name}
-                                </Link>
-                            ))}
-                            <div className='space-y-2 border-t border-gray-200 pt-4 dark:border-gray-800'>
-                                <Link
-                                    href='/login'
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    <Button
-                                        variant='outline'
-                                        className='w-full transition-all duration-300 hover:scale-105 dark:hover:bg-gray-800'
+                {/* Mobile Menu */}
+
+                <div className='md:hidden'>
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <Button variant='outline'>
+                                {' '}
+                                <Menu />{' '}
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent
+                            side='right'
+                            className='w-[300px] sm:w-[400px] p-4'
+                        >
+                            <SheetTitle className='sr-only'>
+                                Navigation Menu
+                            </SheetTitle>
+                            <nav className='flex flex-col space-y-4 mt-8'>
+                                {navItems.map((link) => (
+                                    <Link
+                                        key={link.label}
+                                        href={link.href}
+                                        className='text-lg font-medium'
                                     >
-                                        Login
-                                    </Button>
-                                </Link>
-                                <Link
-                                    href='/register'
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    <Button className='w-full bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg transition-all duration-300 hover:shadow-xl dark:from-blue-600 dark:to-blue-700'>
-                                        Sign Up
-                                    </Button>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                                        {link.label}
+                                    </Link>
+                                ))}
+                                <div className='border-t pt-4 flex flex-col space-y-4'>
+                                    <div className='flex justify-center'></div>
+                                    <ModeToggle />
+                                    {accessToken ? (
+                                        <LogoutButton />
+                                    ) : (
+                                        <Link
+                                            href='/login'
+                                            className='text-lg font-medium'
+                                        >
+                                            <Button>Login</Button>
+                                        </Link>
+                                    )}
+                                </div>
+                            </nav>
+                        </SheetContent>
+                    </Sheet>
+                </div>
             </div>
-        </nav>
+        </header>
     );
 };
 
