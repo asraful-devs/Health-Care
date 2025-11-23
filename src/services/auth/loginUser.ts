@@ -124,12 +124,12 @@ export const loginUser = async (
             const requestPath = redirectTo.toString();
 
             if (isValidRedirectForRole(requestPath, userRole)) {
-                redirect(requestPath);
+                redirect(`${requestPath}?loggedIn=true`);
             } else {
-                redirect(getDefaultDashboardRoute(userRole));
+                redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
             }
         } else {
-            redirect(getDefaultDashboardRoute(userRole));
+            redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
         }
     } catch (error) {
         if ((error as any)?.digest?.startsWith?.('NEXT_REDIRECT')) {
