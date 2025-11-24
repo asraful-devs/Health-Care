@@ -9,10 +9,28 @@ import {
 } from './lib/auth-utils';
 import { deleteCookie, getCookie } from './services/auth/tokenHandlers';
 
+// Debugging এর জন্য
+const DEBUG = process.env.NODE_ENV === 'development';
+
 // This function can be marked `async` if using `await` inside
 export async function proxy(request: NextRequest) {
     // const cookieStore = await cookies();
     const pathName = request.nextUrl.pathname;
+
+    // Log only in development
+    if (DEBUG) {
+        console.log(`🔍 Middleware called for: ${pathName}`);
+    }
+
+    // Skip static assets - CRITICAL!
+    if (
+        pathName.startsWith('/_next') ||
+        pathName.startsWith('/static') ||
+        pathName.match(/\.(ico|png|jpg|jpeg|svg|css|js|woff|woff2|ttf|eot)$/)
+    ) {
+        if (DEBUG) console.log(`⏭️  Skipping static asset: ${pathName}`);
+        return NextResponse.next();
+    }
 
     // const accessToken = request.cookies.get('accessToken')?.value || null;
 
@@ -97,6 +115,6 @@ export const config = {
          * - _next/image (image optimization files)
          * - favicon.ico, sitemap.xml, robots.txt (metadata files)
          */
-        '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.well-known).*)',
+        '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\..*|_next).*)',
     ],
 };

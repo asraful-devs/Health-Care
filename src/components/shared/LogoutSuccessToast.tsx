@@ -18,7 +18,7 @@ const LogoutSuccessToast = () => {
         router.replace(newUrl.toString());
     }, [searchParams, router]);
 
-    return <div></div>;
+    return null;
 };
 
 export default LogoutSuccessToast;
