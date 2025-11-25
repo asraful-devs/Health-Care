@@ -13,7 +13,7 @@ export const getUserInfo = async (): Promise<UserInfo | null> => {
 
         const verifiedToken = jwt.verify(
             accessToken,
-            process.env.JWT_SECRET as string
+            process.env.JWT_ACCESS_SECRET as string
         ) as JwtPayload;
 
         if (!verifiedToken) {
@@ -21,7 +21,7 @@ export const getUserInfo = async (): Promise<UserInfo | null> => {
         }
 
         const userInfo: UserInfo = {
-            name: verifiedToken.name,
+            id: verifiedToken.id,
             email: verifiedToken.email,
             role: verifiedToken.role,
         };

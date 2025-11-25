@@ -4,10 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { SheetTitle } from '@/components/ui/sheet';
-import { getIconComponent } from '@/lib/icon-mapper';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { getIconComponent } from '../../../lib/icon-mapper';
 import { NavSection } from '../../../types/dashboard.interface';
 import { UserInfo } from '../../../types/user.interface';
 
@@ -93,12 +93,12 @@ const DashboardMobileSidebar = ({
                 <div className='flex items-center gap-3'>
                     <div className='h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center'>
                         <span className='text-sm font-semibold text-primary'>
-                            {userInfo.name.charAt(0).toUpperCase()}
+                            {userInfo.id}
                         </span>
                     </div>
                     <div className='flex-1 overflow-hidden'>
                         <p className='text-sm font-medium truncate'>
-                            {userInfo.name}
+                            {userInfo.id}
                         </p>
                         <p className='text-xs text-muted-foreground capitalize'>
                             {userInfo.role.toLowerCase()}

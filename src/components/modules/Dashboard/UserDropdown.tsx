@@ -11,7 +11,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { logoutUser } from '@/services/auth/logoutUser';
-
 import { Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { UserInfo } from '../../../types/user.interface';
@@ -28,15 +27,13 @@ const UserDropdown = ({ userInfo }: UserDropdownProps) => {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant='outline' size='icon' className='rounded-full'>
-                    <span className='text-sm font-semibold'>
-                        {userInfo.name.charAt(0).toUpperCase()}
-                    </span>
+                    <span className='text-sm font-semibold'>{userInfo.id}</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='w-56'>
                 <DropdownMenuLabel>
                     <div className='flex flex-col space-y-1'>
-                        <p className='text-sm font-medium'>{userInfo.name}</p>
+                        <p className='text-sm font-medium'>{userInfo.id}</p>
                         <p className='text-xs text-muted-foreground'>
                             {userInfo.email}
                         </p>
