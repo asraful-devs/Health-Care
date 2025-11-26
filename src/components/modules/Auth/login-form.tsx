@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { loginUser } from '@/services/auth/loginUser';
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import EyeButton from '../../shared/EyeButton';
 import { Button } from '../../ui/button';
 import {
     Field,
@@ -14,6 +15,7 @@ import { Input } from '../../ui/input';
 
 const LoginForm = ({ redirect }: { redirect?: string }) => {
     const [state, formAction, isPending] = useActionState(loginUser, null);
+    const [showPassword, setShowPassword] = useState(false);
 
     const getFieldError = (fieldName: string) => {
         if (state && state.errors) {
@@ -58,15 +60,22 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
                     </Field>
 
                     {/* Password */}
-                    <Field>
+                    <Field className=''>
                         <FieldLabel htmlFor='password'>Password</FieldLabel>
-                        <Input
-                            id='password'
-                            name='password'
-                            type='password'
-                            placeholder='Enter your password'
-                            //   required
-                        />
+                        <div className='relative'>
+                            <Input
+                                id='password'
+                                name='password'
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder='Enter your password'
+                                className='pr-10'
+                                //   required
+                            />
+                            <EyeButton
+                                isVisible={showPassword}
+                                onToggle={() => setShowPassword(!showPassword)}
+                            />
+                        </div>
                         {getFieldError('password') && (
                             <FieldDescription className='text-red-600'>
                                 {getFieldError('password')}

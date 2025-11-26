@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { registerPatient } from '../../../services/auth/registerPatient';
+import EyeButton from '../../shared/EyeButton';
 import { Button } from '../../ui/button';
 import {
     Field,
@@ -18,6 +19,8 @@ const RegisterForm = () => {
         registerPatient,
         null
     );
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const getFieldError = (fieldName: string) => {
         if (state && state.errors) {
@@ -95,12 +98,19 @@ const RegisterForm = () => {
                     {/* Password */}
                     <Field>
                         <FieldLabel htmlFor='password'>Password</FieldLabel>
-                        <Input
-                            id='password'
-                            name='password'
-                            type='password'
-                            placeholder='********'
-                        />
+                        <div className='relative'>
+                            <Input
+                                id='password'
+                                name='password'
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder='********'
+                                className='pr-10'
+                            />
+                            <EyeButton
+                                isVisible={showPassword}
+                                onToggle={() => setShowPassword(!showPassword)}
+                            />
+                        </div>
                         {getFieldError('password') && (
                             <FieldDescription className='text-red-600'>
                                 {getFieldError('password')}
@@ -113,12 +123,21 @@ const RegisterForm = () => {
                         <FieldLabel htmlFor='confirmPassword'>
                             Confirm Password
                         </FieldLabel>
-                        <Input
-                            id='confirmPassword'
-                            name='confirmPassword'
-                            type='password'
-                            placeholder='********'
-                        />
+                        <div className='relative'>
+                            <Input
+                                id='confirmPassword'
+                                name='confirmPassword'
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                placeholder='********'
+                                className='pr-10'
+                            />
+                            <EyeButton
+                                isVisible={showConfirmPassword}
+                                onToggle={() =>
+                                    setShowConfirmPassword(!showConfirmPassword)
+                                }
+                            />
+                        </div>
                         {getFieldError('confirmPassword') && (
                             <FieldDescription className='text-red-600'>
                                 {getFieldError('confirmPassword')}
