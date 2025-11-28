@@ -59,6 +59,7 @@ export async function getSpecialities() {
             '/specialties/get-all-specialties'
         );
         const result = await response.json();
+        // console.log(result.data.data, 'getSpecialities');
         return result;
     } catch (error: any) {
         console.log(error);
