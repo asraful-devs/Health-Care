@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
+import { serverFetch } from '../../lib/serverFetchHelper';
+import { zodValidator } from '../../lib/zodValidator';
+import { registerValidationZodSchema } from '../../zod/auth.validation';
 import { loginUser } from './loginUser';
-import { registerValidationZodSchema } from './zod';
 
 export const registerPatient = async (
     _currentState: any,
@@ -10,7 +12,7 @@ export const registerPatient = async (
 ): Promise<any> => {
     try {
         // console.log(formData.get('address'));
-        const validationData = {
+        const payload = {
             name: formData.get('name'),
             address: formData.get('address'),
             email: formData.get('email'),
@@ -18,29 +20,23 @@ export const registerPatient = async (
             confirmPassword: formData.get('confirmPassword'),
         };
 
-        const validatedFields =
-            registerValidationZodSchema.safeParse(validationData);
-
-        console.log(validatedFields, 'val');
-
-        if (!validatedFields.success) {
-            return {
-                success: false,
-                errors: validatedFields.error.issues.map((issue) => {
-                    return {
-                        field: issue.path[0],
-                        message: issue.message,
-                    };
-                }),
-            };
+        if (
+            zodValidator(payload, registerValidationZodSchema).success === false
+        ) {
+            return zodValidator(payload, registerValidationZodSchema);
         }
 
+        const validatedPayload: any = zodValidator(
+            payload,
+            registerValidationZodSchema
+        ).data;
+
         const registerData = {
-            password: formData.get('password'),
+            password: validatedPayload.password,
             patient: {
-                name: formData.get('name'),
-                address: formData.get('address'),
-                email: formData.get('email'),
+                name: validatedPayload.name,
+                address: validatedPayload.address,
+                email: validatedPayload.email,
             },
         };
 
@@ -48,13 +44,13 @@ export const registerPatient = async (
 
         newFormData.append('data', JSON.stringify(registerData));
 
-        const res = await fetch(
-            'http://localhost:5000/api/v1/user/create-patient',
-            {
-                method: 'POST',
-                body: newFormData,
-            }
-        );
+        if (formData.get('file')) {
+            newFormData.append('file', formData.get('file') as Blob);
+        }
+
+        const res = await serverFetch.post('/user/create-patient', {
+            body: newFormData,
+        });
         const result = await res.json();
 
         if (result.success) {

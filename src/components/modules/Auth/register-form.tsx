@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { registerPatient } from '../../../services/auth/registerPatient';
 import EyeButton from '../../shared/EyeButton';
+import InputFieldError from '../../shared/InputFieldError';
 import { Button } from '../../ui/button';
 import {
     Field,
@@ -21,21 +21,6 @@ const RegisterForm = () => {
     );
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-    const getFieldError = (fieldName: string) => {
-        if (state && state.errors) {
-            const error = state.errors.find(
-                (err: any) => err.field === fieldName
-            );
-            if (error) {
-                return error.message;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    };
 
     useEffect(() => {
         if (state && !state.success && state.message) {
@@ -56,11 +41,12 @@ const RegisterForm = () => {
                             type='text'
                             placeholder='John Doe'
                         />
-                        {getFieldError('name') && (
+                        {/* {getInputFieldError('name', state) && (
                             <FieldDescription className='text-red-600'>
-                                {getFieldError('name')}
+                                {getInputFieldError('name', state)}
                             </FieldDescription>
-                        )}
+                        )} */}
+                        <InputFieldError field='name' state={state} />
                     </Field>
 
                     {/* Address */}
@@ -72,11 +58,7 @@ const RegisterForm = () => {
                             type='text'
                             placeholder='123 Main St'
                         />
-                        {getFieldError('address') && (
-                            <FieldDescription className='text-red-600'>
-                                {getFieldError('address')}
-                            </FieldDescription>
-                        )}
+                        <InputFieldError field='address' state={state} />
                     </Field>
 
                     {/* Email */}
@@ -88,11 +70,7 @@ const RegisterForm = () => {
                             type='email'
                             placeholder='m@example.com'
                         />
-                        {getFieldError('email') && (
-                            <FieldDescription className='text-red-600'>
-                                {getFieldError('email')}
-                            </FieldDescription>
-                        )}
+                        <InputFieldError field='email' state={state} />
                     </Field>
 
                     {/* Password */}
@@ -111,11 +89,7 @@ const RegisterForm = () => {
                                 onToggle={() => setShowPassword(!showPassword)}
                             />
                         </div>
-                        {getFieldError('password') && (
-                            <FieldDescription className='text-red-600'>
-                                {getFieldError('password')}
-                            </FieldDescription>
-                        )}
+                        <InputFieldError field='password' state={state} />
                     </Field>
 
                     {/* Confirm Password */}
@@ -138,11 +112,10 @@ const RegisterForm = () => {
                                 }
                             />
                         </div>
-                        {getFieldError('confirmPassword') && (
-                            <FieldDescription className='text-red-600'>
-                                {getFieldError('confirmPassword')}
-                            </FieldDescription>
-                        )}
+                        <InputFieldError
+                            field='confirmPassword'
+                            state={state}
+                        />
                     </Field>
                 </div>
 
